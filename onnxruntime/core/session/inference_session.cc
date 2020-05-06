@@ -630,11 +630,13 @@ common::Status InferenceSession::TransformGraph(onnxruntime::Graph& graph,
 
   // Do partitioning based on execution providers' capability.
   GraphPartitioner partitioner(kernel_registry_manager, providers);
+  std::cout << "inference_session.cc - InferenceSession::TransformGraph - Begin Partitioning\n";
   ORT_RETURN_IF_ERROR_SESSIONID_(
       partitioner.Partition(graph, session_state.ExportDll(), session_state.GetMutableFuncMgr()));
 
   // apply transformers except default transformers
   // Default transformers are required for correctness and they are owned and run by inference session
+  std::cout << "inference_session.cc - InferenceSession::TransformGraph - Apply Transformers\n";
   for (int i = static_cast<int>(TransformerLevel::Level1); i <= static_cast<int>(TransformerLevel::MaxLevel); i++) {
     ORT_RETURN_IF_ERROR_SESSIONID_(
         graph_transformer_mgr.ApplyTransformers(graph, static_cast<TransformerLevel>(i), *session_logger_));
@@ -646,7 +648,8 @@ common::Status InferenceSession::TransformGraph(onnxruntime::Graph& graph,
 
   // Now every node should be already assigned to an execution provider
   std::unordered_map<std::string, std::vector<std::string>> node_placements;
-  bool is_verbose_mode = session_logger_->GetSeverity() == logging::Severity::kVERBOSE;
+  // bool is_verbose_mode = session_logger_->GetSeverity() == logging::Severity::kVERBOSE;
+  bool is_verbose_mode = 1;
   for (auto& node : graph.Nodes()) {
     const auto& node_provider = node.GetExecutionProviderType();
     if (node_provider.empty()) {
@@ -673,14 +676,17 @@ common::Status InferenceSession::TransformGraph(onnxruntime::Graph& graph,
   // print placement info
   if (is_verbose_mode) {
     LOGS(*session_logger_, VERBOSE) << "Node placements";
-    if (node_placements.size() == 1) {
-      LOGS(*session_logger_, VERBOSE) << "All nodes have been placed on [" << node_placements.begin()->first << "].";
+    if (0) {
+    // if (node_placements.size() == 1) {
+    //   LOGS(*session_logger_, VERBOSE) << "All nodes have been placed on [" << node_placements.begin()->first << "].";
     } else {
       for (const auto& pr : node_placements) {
         std::ostringstream all_nodes_str;
-        std::copy(pr.second.begin(), pr.second.end(), std::ostream_iterator<std::string>(all_nodes_str, ", "));
-        LOGS(*session_logger_, VERBOSE) << " Provider: [" << pr.first << "]"
-                                        << ": [" << all_nodes_str.str() << "]";
+        std::copy(pr.second.begin(), pr.second.end(), std::ostream_iterator<std::string>(all_nodes_str, "\n - "));
+	std::cout << "\nFinal Node Placement:\n";
+        LOGS(*session_logger_, WARNING) << " \nProvider: [" << pr.first << "]\n"
+                                        << " - " << all_nodes_str.str();
+	
       }
     }
   }

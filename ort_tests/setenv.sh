@@ -9,4 +9,4 @@ fi
 
 ################################################################################
 # Set environment variables
-export LD_LIBRARY_PATH=/home/brandon/work/ecplr/onnxruntime/build/Linux/RelWithDebInfo/
+export LD_LIBRARY_PATH=../build/Linux/RelWithDebInfo/

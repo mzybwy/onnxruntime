@@ -4,7 +4,7 @@ TESTS = CXX_Api_Sample C_Api_Sample
 
 ################################################################################
 # Paths
-ORTROOT=/home/brandon/work/ecplr/onnxruntime
+ORTROOT=..
 
 ################################################################################
 # Compiler Config

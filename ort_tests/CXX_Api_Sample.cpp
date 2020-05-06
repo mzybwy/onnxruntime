@@ -36,9 +36,9 @@ int main(int argc, char* argv[]) {
 #ifdef _WIN32
   const wchar_t* model_path = L"squeezenet.onnx";
 #else
-  // const char* model_path = "squeezenet.onnx";
-  // const char* model_path = "resnet50_v1.onnx";
-  const char* model_path = "2-layer-nested-subgraph-test.onnx";
+  const char* model_path = "../csharp/testdata/squeezenet.onnx";
+  // const char* model_path = "../onnxruntime/python/tools/quantization/E2E_example_model/resnet50_v1.onnx";
+  // const char* model_path = "../build/Linux/RelWithDebInfo/2-layer-nested-subgraph-test.onnx";
 #endif
 
   printf("Using Onnxruntime C++ API\n");

@@ -79,6 +79,7 @@ target_link_libraries(onnxruntime PRIVATE
     ${PROVIDERS_OPENVINO}
     ${PROVIDERS_NUPHAR}
     ${PROVIDERS_DML}
+    ${PROVIDERS_TIDL}
     ${PROVIDERS_ACL}
     ${onnxruntime_winml}
     onnxruntime_optimizer

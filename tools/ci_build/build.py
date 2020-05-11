@@ -137,6 +137,7 @@ Use the individual flags to only run the specified stages.
     parser.add_argument("--use_mimalloc", default=['none'], choices=['none', 'stl', 'arena', 'all'], help="Use mimalloc.")
     parser.add_argument("--use_openblas", action='store_true', help="Build with OpenBLAS.")
     parser.add_argument("--use_dnnl", action='store_true', help="Build with DNNL.")
+    parser.add_argument("--use_tidl", action='store_true', help="Build with TIDL.")
     parser.add_argument("--use_mklml", action='store_true', help="Build with MKLML.")
     parser.add_argument("--use_featurizers", action='store_true', help="Build with ML Featurizer support.")
     parser.add_argument("--use_ngraph", action='store_true', help="Build with nGraph.")
@@ -320,6 +321,7 @@ def generate_build_tree(cmake_path, source_dir, build_dir, cuda_home, cudnn_home
                  "-Donnxruntime_BUILD_SHARED_LIB=" + ("ON" if args.build_shared_lib else "OFF"),
                  "-Donnxruntime_USE_EIGEN_FOR_BLAS=" + ("OFF" if args.use_openblas else "ON"),
                  "-Donnxruntime_USE_OPENBLAS=" + ("ON" if args.use_openblas else "OFF"),
+                 "-Donnxruntime_USE_TIDL=" + ("ON" if args.use_tidl else "OFF"),
                  "-Donnxruntime_USE_DNNL=" + ("ON" if args.use_dnnl else "OFF"),
                  "-Donnxruntime_USE_MKLML=" + ("ON" if args.use_mklml else "OFF"),
                  "-Donnxruntime_USE_NGRAPH=" + ("ON" if args.use_ngraph else "OFF"),
@@ -821,6 +823,8 @@ def build_python_wheel(source_dir, build_dir, configs, use_cuda, use_ngraph, use
             args.append('--use_ngraph')
         elif use_dnnl:
             args.append('--use_dnnl')
+        elif use_tidl:
+            args.append('--use_tidl')
         elif use_openvino:
             args.append('--use_openvino')
         elif use_nuphar:

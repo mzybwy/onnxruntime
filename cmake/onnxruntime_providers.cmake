@@ -73,6 +73,10 @@ if(onnxruntime_USE_WINML)
   set(PROVIDERS_WINML onnxruntime_providers_winml)
   list(APPEND ONNXRUNTIME_PROVIDER_NAMES winml)
 endif()
+if(onnxruntime_USE_TIDL)
+  set(PROVIDERS_ACL onnxruntime_providers_tidl)
+  list(APPEND ONNXRUNTIME_PROVIDER_NAMES tidl)
+endif()
 if(onnxruntime_USE_ACL)
   set(PROVIDERS_ACL onnxruntime_providers_acl)
   list(APPEND ONNXRUNTIME_PROVIDER_NAMES acl)
@@ -470,6 +474,23 @@ if (onnxruntime_USE_DML)
 
   set_target_properties(onnxruntime_providers_dml PROPERTIES LINKER_LANGUAGE CXX)
   set_target_properties(onnxruntime_providers_dml PROPERTIES FOLDER "ONNXRuntime")
+endif()
+
+if (onnxruntime_USE_TIDL)
+  add_definitions(-DUSE_TIDL=1)
+  file(GLOB_RECURSE onnxruntime_providers_tidl_cc_srcs
+    "${ONNXRUNTIME_ROOT}/core/providers/tidl/*.h"
+    "${ONNXRUNTIME_ROOT}/core/providers/tidl/*.cc"
+  )
+
+  source_group(TREE ${ONNXRUNTIME_ROOT}/core FILES ${onnxruntime_providers_tidl_cc_srcs})
+  add_library(onnxruntime_providers_tidl ${onnxruntime_providers_tidl_cc_srcs})
+  onnxruntime_add_include_to_target(onnxruntime_providers_tidl onnxruntime_common onnxruntime_framework onnx onnx_proto protobuf::libprotobuf)
+  add_dependencies(onnxruntime_providers_tidl ${onnxruntime_EXTERNAL_DEPENDENCIES})
+  # set_target_properties(onnxruntime_providers_tidl PROPERTIES FOLDER "ONNXRuntime")
+  target_include_directories(onnxruntime_providers_tidl PRIVATE ${ONNXRUNTIME_ROOT} ${eigen_INCLUDE_DIRS} ${TIDL_INCLUDE_DIR})
+  install(DIRECTORY ${PROJECT_SOURCE_DIR}/../include/onnxruntime/core/providers/tidl  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/onnxruntime/core/providers)
+  set_target_properties(onnxruntime_providers_tidl PROPERTIES LINKER_LANGUAGE CXX)
 endif()
 
 if (onnxruntime_USE_ACL)

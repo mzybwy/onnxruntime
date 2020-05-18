@@ -2,12 +2,13 @@
 // Copyright (c) 2019, NXP Semiconductor, Inc. All rights reserved.
 // Licensed under the MIT License.
 
-#include "tidl_execution_provider.h"
+#include "core/providers/tidl/tidl_execution_provider.h"
 #include "core/framework/allocator.h"
 #include "core/framework/op_kernel.h"
 #include "core/framework/kernel_registry.h"
 #include "core/framework/compute_capability.h"
 #include "contrib_ops/cpu_contrib_kernels.h"
+#include "nn/pool.h"
 
 namespace onnxruntime {
 
@@ -17,48 +18,26 @@ namespace onnxruntime {
   namespace tidl {
 
     // Forward declarations of op kernels
-    class ONNX_OPERATOR_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 6, Relu);
-    class ONNX_OPERATOR_VERSIONED_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 7, 9, Gemm);
-    class ONNX_OPERATOR_VERSIONED_TYPED_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 1, 9, float, MatMul);
-    class ONNX_OPERATOR_VERSIONED_TYPED_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 1, 9, double, MatMul);
-    class ONNX_OPERATOR_VERSIONED_TYPED_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 9, 9, int32_t, MatMul);
-    class ONNX_OPERATOR_VERSIONED_TYPED_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 9, 9, uint32_t, MatMul);
-    class ONNX_OPERATOR_VERSIONED_TYPED_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 9, 9, int64_t, MatMul);
-    class ONNX_OPERATOR_VERSIONED_TYPED_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 9, 9, uint64_t, MatMul);
-    class ONNX_OPERATOR_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 1, Conv);
-    class ONNX_OPERATOR_VERSIONED_TYPED_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 7, 9, float, AveragePool);
-    class ONNX_OPERATOR_VERSIONED_TYPED_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 1, 7, float, MaxPool);
-    class ONNX_OPERATOR_VERSIONED_TYPED_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 8, 9, float, MaxPool);
+    class ONNX_OPERATOR_VERSIONED_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 1, 7, MaxPool);
+    class ONNX_OPERATOR_VERSIONED_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 8, 11, MaxPool);
+    class ONNX_OPERATOR_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 12, MaxPool);
 
-    class ONNX_OPERATOR_VERSIONED_TYPED_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 1, 8, float, GlobalAveragePool);
-    class ONNX_OPERATOR_VERSIONED_TYPED_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 1, 8, float, GlobalMaxPool);
+    class ONNX_OPERATOR_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 1, GlobalMaxPool);
 
-    // Opset 10
-    class ONNX_OPERATOR_VERSIONED_TYPED_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 10, 10, float, MaxPool);
-    class ONNX_OPERATOR_VERSIONED_TYPED_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 10, 10, float, AveragePool);
+    // OpSet 12
+    class ONNX_OPERATOR_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 12, MaxPool);
 
     static void RegisterTIDLKernels(KernelRegistry& kernel_registry) {
-      kernel_registry.Register(BuildKernelCreateInfo<ONNX_OPERATOR_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 6, Relu)>());
-      kernel_registry.Register(BuildKernelCreateInfo<ONNX_OPERATOR_VERSIONED_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 7, 9, Gemm)>());
+      static const BuildKernelCreateInfoFn function_table[] = {
+	BuildKernelCreateInfo<ONNX_OPERATOR_VERSIONED_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 1, 7, MaxPool)>,
+	BuildKernelCreateInfo<ONNX_OPERATOR_VERSIONED_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 8, 11, MaxPool)>,
+	BuildKernelCreateInfo<ONNX_OPERATOR_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 1, GlobalMaxPool)>,
+	BuildKernelCreateInfo<ONNX_OPERATOR_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 12, MaxPool)>,
+      };
 
-      kernel_registry.Register(BuildKernelCreateInfo<ONNX_OPERATOR_VERSIONED_TYPED_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 1, 9, float, MatMul)>());
-      kernel_registry.Register(BuildKernelCreateInfo<ONNX_OPERATOR_VERSIONED_TYPED_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 1, 9, double, MatMul)>());
-      kernel_registry.Register(BuildKernelCreateInfo<ONNX_OPERATOR_VERSIONED_TYPED_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 9, 9, int32_t, MatMul)>());
-      kernel_registry.Register(BuildKernelCreateInfo<ONNX_OPERATOR_VERSIONED_TYPED_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 9, 9, uint32_t, MatMul)>());
-      kernel_registry.Register(BuildKernelCreateInfo<ONNX_OPERATOR_VERSIONED_TYPED_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 9, 9, int64_t, MatMul)>());
-      kernel_registry.Register(BuildKernelCreateInfo<ONNX_OPERATOR_VERSIONED_TYPED_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 9, 9, uint64_t, MatMul)>());
-      kernel_registry.Register(BuildKernelCreateInfo<ONNX_OPERATOR_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 1, Conv)>());
-
-      kernel_registry.Register(BuildKernelCreateInfo<ONNX_OPERATOR_VERSIONED_TYPED_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 7, 9, float, AveragePool)>());
-      kernel_registry.Register(BuildKernelCreateInfo<ONNX_OPERATOR_VERSIONED_TYPED_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 1, 7, float, MaxPool)>());
-      kernel_registry.Register(BuildKernelCreateInfo<ONNX_OPERATOR_VERSIONED_TYPED_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 8, 9, float, MaxPool)>());
-
-      kernel_registry.Register(BuildKernelCreateInfo<ONNX_OPERATOR_VERSIONED_TYPED_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 1, 8, float, GlobalAveragePool)>());
-      kernel_registry.Register(BuildKernelCreateInfo<ONNX_OPERATOR_VERSIONED_TYPED_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 1, 8, float, GlobalMaxPool)>());
-
-      // Opset 10
-      kernel_registry.Register(BuildKernelCreateInfo<ONNX_OPERATOR_VERSIONED_TYPED_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 10, 10, float, MaxPool)>());
-      kernel_registry.Register(BuildKernelCreateInfo<ONNX_OPERATOR_VERSIONED_TYPED_KERNEL_CLASS_NAME(kTidlExecutionProvider, kOnnxDomain, 10, 10, float, AveragePool)>());
+      for (auto& function_table_entry : function_table) {
+	kernel_registry.Register(function_table_entry());
+      }
     }
 
     std::shared_ptr<KernelRegistry> GetTidlKernelRegistry() {
@@ -91,7 +70,7 @@ namespace onnxruntime {
 				   return onnxruntime::make_unique<CPUAllocator>(std::move(memory_info));
 				 };
 
-    DeviceAllocatorRegistrationInfo cpu_memory_info{
+    DeviceAllocatorRegistrationInfo cpu_memory_info {
 						    OrtMemTypeCPUOutput,
 						    std::move(cpu_allocator_factory),
 						    std::numeric_limits<size_t>::max()};

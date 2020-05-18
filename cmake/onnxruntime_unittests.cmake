@@ -306,6 +306,7 @@ set(ONNXRUNTIME_TEST_LIBS
     ${PROVIDERS_NNAPI}
     ${PROVIDERS_DML}
     ${PROVIDERS_ACL}
+    ${PROVIDERS_TIDL}
     onnxruntime_optimizer
     onnxruntime_providers
     onnxruntime_util

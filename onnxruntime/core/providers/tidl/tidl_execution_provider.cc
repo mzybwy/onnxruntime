@@ -409,6 +409,7 @@ Status TIDLExecutionProvider::Compile(const std::vector<onnxruntime::Node*>& fus
     auto attributes = fused_node->GetAttributes();
     NodeComputeInfo compute_info;
 
+    // !tidl
     // Pass a null "compute_info" object for now. This is where we will add in the
     // .. TIDL kernel references. See DNNL implementation for details.
 

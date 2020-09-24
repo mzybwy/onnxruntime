@@ -7,6 +7,7 @@
 #include <onnxruntime_cxx_api.h>
 // #include <core/providers/tidl/tidl_provider_factory.h>
 #include "../include/onnxruntime/core/providers/tidl/tidl_provider_factory.h"
+#include "../include/onnxruntime/core/providers/dnnl/dnnl_provider_factory.h"
 
 int main(int argc, char* argv[]) {
   //*************************************************************************
@@ -22,6 +23,7 @@ int main(int argc, char* argv[]) {
   // session (we also need to include cuda_provider_factory.h above which defines it)
   // #include "cuda_provider_factory.h"
   OrtSessionOptionsAppendExecutionProvider_Tidl(session_options, 1);
+  OrtSessionOptionsAppendExecutionProvider_Dnnl(session_options, 1);
 
   // Sets graph optimization level
   // Available levels are

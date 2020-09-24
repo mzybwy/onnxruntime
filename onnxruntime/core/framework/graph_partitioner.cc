@@ -163,6 +163,7 @@ namespace onnxruntime {
     // run the function by SessionOption, we should create a function kernel for it and
     // delegate the compute to the functions inside the dlls.
     for (auto& provider : providers_) {
+        std::cout << "\n\n\n\n\n\nPROVIDER\n\n\n\n\n";
       int count = 0;
       std::vector<Node*> nodes_need_compile;
       std::vector<std::unique_ptr<ComputeCapability>> capabilities =
@@ -174,7 +175,8 @@ namespace onnxruntime {
 	}
       }
 
-      if (!nodes_need_compile.empty()) {
+      if (0) {
+      // if (!nodes_need_compile.empty()) {
 	std::cout << "\nCOMPILE TIME\n";
 	if (export_dll) {
 	  std::string dll_path;

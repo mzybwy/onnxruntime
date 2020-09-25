@@ -421,9 +421,6 @@ ORT_API_STATUS_IMPL(OrtApis::CreateSession, _In_ const OrtEnv* env, _In_ const O
                     _In_ const OrtSessionOptions* options, _Outptr_ OrtSession** out) {
   API_IMPL_BEGIN
   std::unique_ptr<onnxruntime::InferenceSession> sess;
-
-  std::cout << "\n\n\n\n WHAT THE FUCK   " << __PRETTY_FUNCTION__ << "\n\n\n\n";
-  
   try {
     sess = onnxruntime::make_unique<onnxruntime::InferenceSession>(
         options == nullptr ? onnxruntime::SessionOptions() : options->value,

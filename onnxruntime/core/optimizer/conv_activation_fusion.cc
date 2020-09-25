@@ -92,8 +92,6 @@ Status ConvActivationFusion::ApplyImpl(Graph& graph, bool& modified, int graph_l
 
     const auto& next_node = *(node->OutputNodesBegin());
 
-    std::cout << node->OpType() << " --> " << next_node.OpType() << "\n";
-
     if (next_node.GetExecutionProviderType() != node->GetExecutionProviderType()) {
       continue;
     }
@@ -126,10 +124,6 @@ Status ConvActivationFusion::ApplyImpl(Graph& graph, bool& modified, int graph_l
     Node& conv_node = *node;
     Node& act_node = *graph.GetNode(next_node.Index());
 
-    // std::cout << "conv_activation_fusion.cc - ConvActivationFusion::ApplyImpl - Add FusedConv node - "
-    // 	      << conv_node.Name() << "\n";
-    std::cout << "Create FusedConv: " << conv_node.Name() << "\n";
-    
     Node& fused_conv = graph.AddNode(graph.GenerateNodeName("fused " + conv_node.Name()), "FusedConv",
                                      "fused Conv " + conv_node.Name() + "with activation " + act_node.OpType(),
                                      conv_node.MutableInputDefs(),

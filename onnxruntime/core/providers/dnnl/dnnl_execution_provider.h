@@ -170,17 +170,8 @@ class DNNLExecutionProvider : public IExecutionProvider {
   mutable int subgraph_index_ = 0;
 
   // supported Dnnl Operators
-  std::set<std::string> dnnl_ops_ = {
-      "Conv",
-      "BatchNormalization",
-      "Relu",
-      "Sum",
-      "AveragePool",
-      "GlobalMaxPool",
-      "GlobalAveragePool",
-      "MaxPool",
-      "LRN"
-  };
+  std::set<std::string> dnnl_ops_ = {"Conv", "BatchNormalization", "Relu", "Sum",
+                                       "AveragePool", "GlobalMaxPool", "GlobalAveragePool", "MaxPool", "LRN"};
 
   mutable std::unordered_map<std::string, std::shared_ptr<ort_dnnl::Subgraph>> mkl_subgraphs_;
 };

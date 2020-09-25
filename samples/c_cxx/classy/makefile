@@ -11,13 +11,13 @@ CXXFLAGS += $(INC)
 
 ################################################################################
 # Linker Config
-LIBDIR = $(ORTROOT)/build/Linux/RelWithDebInfo/
-LIBS = onnxruntime
-LDFLAGS = -L$(LIBDIR) -l$(LIBS)
+LIBDIR = -L$(ORTROOT)/build/Linux/RelWithDebInfo/ -L/usr/lib/x86_64-linux-gnu
+LIBS = -lonnxruntime -lopencv_core -lopencv_imgcodecs -lopencv_imgproc
+LDFLAGS = $(LIBDIR) $(LIBS)
 
 ################################################################################
 # Srcs Etc
-SRCS := main.cc
+SRCS := main.cc validator.cc
 OBJS := $(SRCS:%=%.o)
 
 

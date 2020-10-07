@@ -11,7 +11,7 @@ CXXFLAGS += $(INC)
 
 ################################################################################
 # Linker Config
-LIBDIR = -L$(ORTROOT)/build/Linux/RelWithDebInfo/ -L/usr/lib/x86_64-linux-gnu
+LIBDIR = -L$(ORTROOT)/build/Linux/RelWithDebInfo/ -L$(ORTROOT)../opencv-3.1.0/build/lib
 LIBS = -lonnxruntime -lopencv_core -lopencv_imgcodecs -lopencv_imgproc
 LDFLAGS = $(LIBDIR) $(LIBS)
 
